@@ -11,16 +11,35 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/textview_search"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Busque por um artista..." />
+            android:orientation="horizontal">
 
-        <ListView
-            android:id="@+id/listview_artists"
+            <EditText
+                android:id="@+id/textview_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Busque por um artista..." />
+            <Button
+                android:id="@+id/button_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="Buscar" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ListView
+                android:id="@+id/listview_artists"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
     </LinearLayout>
 
