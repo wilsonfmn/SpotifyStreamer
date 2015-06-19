@@ -3,6 +3,7 @@ package com.example.android.spotifystreamer;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,24 +84,31 @@ public class ArtistsFragment extends Fragment {
         protected List<String> doInBackground(String... params) {
             String artistSearchText = params[0];
 
+            // No query
+            if(TextUtils.isEmpty(artistSearchText)){
+                return null;
+            }
+
             SpotifyApi spotifyApi = new SpotifyApi();
             SpotifyService spotifyService = spotifyApi.getService();
 
-            ArtistsPager artistsPager = spotifyService.searchArtists(artistSearchText);
-            Log.d(LOG_TAG, "It works!");
-            List<Artist> artists = artistsPager.artists.items;
-            //Couldn't find anything
-            if(!artists.isEmpty()) {
-                List<String> artistsNames = new ArrayList<>();
-                for(Artist artist : artists) {
-                    Log.d(LOG_TAG, artist.name);
-                    artistsNames.add(artist.name);
+            try {
+                ArtistsPager artistsPager = spotifyService.searchArtists(artistSearchText);
+                Log.d(LOG_TAG, "It works!");
+                List<Artist> artists = artistsPager.artists.items;
+                //Couldn't find anything
+                if(!artists.isEmpty()) {
+                    List<String> artistsNames = new ArrayList<>();
+                    for(Artist artist : artists) {
+                        Log.d(LOG_TAG, artist.name);
+                        artistsNames.add(artist.name);
+                    }
+                    return artistsNames;
                 }
-                return artistsNames;
+            } catch(RetrofitError e) {
+                Log.e(LOG_TAG, e.getMessage().toString());
+                e.printStackTrace();
             }
-            Toast failureArtistToast = Toast.makeText(getActivity(),
-                "Não foi encontrado nenhum artista", Toast.LENGTH_SHORT);
-            failureArtistToast.show();
 
             return null;
         }
@@ -113,6 +121,10 @@ public class ArtistsFragment extends Fragment {
                     mArtistAdapter.add(artistName);
                 }
                 // New data is back from the server.  Hooray!
+            } else {
+                Toast failureArtistToast = Toast.makeText(getActivity(),
+                        "Não foi encontrado nenhum artista", Toast.LENGTH_SHORT);
+                failureArtistToast.show();
             }
         }
     }
