@@ -33,7 +33,8 @@ import retrofit.client.Response;
  */
 public class ArtistsFragment extends Fragment {
 
-    private ArrayAdapter<String> mArtistAdapter;
+    private List<Artist> artists;
+    private ImageAndInfoAdapter mArtistAdapter;
 
     public ArtistsFragment() {
     }
@@ -42,18 +43,10 @@ public class ArtistsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        String[] artistsTest = {"Angra", "Shaman", "Andre Mattos", "Alguem Mais"};
-        List<String> artistsList = Arrays.asList(artistsTest);
-
-        mArtistAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_artists,
-                R.id.list_item_artist_textview, artistsList);
-
         mArtistAdapter =
-               new ArrayAdapter<String>(
+               new ImageAndInfoAdapter(
                        getActivity(), // The current context (this activity)
-                       R.layout.list_item_artists, // The name of the layout ID.
-                       R.id.list_item_artist_textview, // The ID of the textview to populate.
-                       new ArrayList<String>());
+                       new ArrayList<Artist>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -76,12 +69,12 @@ public class ArtistsFragment extends Fragment {
         return rootView;
     }
 
-    public class FetchArtistsTask extends AsyncTask<String, Void, List<String>> {
+    public class FetchArtistsTask extends AsyncTask<String, Void, List<Artist>> {
 
         private final String LOG_TAG = FetchArtistsTask.class.getSimpleName();
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected List<Artist> doInBackground(String... params) {
             String artistSearchText = params[0];
 
             // No query
@@ -94,16 +87,9 @@ public class ArtistsFragment extends Fragment {
 
             try {
                 ArtistsPager artistsPager = spotifyService.searchArtists(artistSearchText);
-                Log.d(LOG_TAG, "It works!");
-                List<Artist> artists = artistsPager.artists.items;
-                //Couldn't find anything
+                artists = artistsPager.artists.items;
                 if(!artists.isEmpty()) {
-                    List<String> artistsNames = new ArrayList<>();
-                    for(Artist artist : artists) {
-                        Log.d(LOG_TAG, artist.name);
-                        artistsNames.add(artist.name);
-                    }
-                    return artistsNames;
+                    return artists;
                 }
             } catch(RetrofitError e) {
                 Log.e(LOG_TAG, e.getMessage().toString());
@@ -114,12 +100,11 @@ public class ArtistsFragment extends Fragment {
         }
 
         @Override
-        public void onPostExecute(List<String> artistsNames) {
-            if (artistsNames != null) {
+        public void onPostExecute(List<Artist> artists) {
+            if (artists != null) {
                 mArtistAdapter.clear();
-                for(String artistName : artistsNames) {
-                    mArtistAdapter.add(artistName);
-                }
+                mArtistAdapter.addAll(artists);
+                mArtistAdapter.notifyDataSetChanged();
                 // New data is back from the server.  Hooray!
             } else {
                 Toast failureArtistToast = Toast.makeText(getActivity(),
