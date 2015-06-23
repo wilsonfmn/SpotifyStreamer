@@ -29,13 +29,13 @@ import kaaes.spotify.webapi.android.models.Image;
 /**
  * Created by wilson.neto on 19/06/2015.
  */
-public class ImageAndInfoAdapter extends BaseAdapter {
+public class ArtistAdapter extends BaseAdapter {
 
     List<Artist> artists;
     LayoutInflater inflater;
     Context context;
 
-    public ImageAndInfoAdapter(Context context, List<Artist> artists) {
+    public ArtistAdapter(Context context, List<Artist> artists) {
         this.artists = artists;
         this.context = context;
         this.inflater = LayoutInflater.from(context);

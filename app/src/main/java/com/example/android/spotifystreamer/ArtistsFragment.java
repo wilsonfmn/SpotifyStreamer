@@ -1,5 +1,6 @@
 package com.example.android.spotifystreamer;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -8,24 +9,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.Artists;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
-import retrofit.Callback;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 
 /**
@@ -34,7 +31,7 @@ import retrofit.client.Response;
 public class ArtistsFragment extends Fragment {
 
     private List<Artist> artists;
-    private ImageAndInfoAdapter mArtistAdapter;
+    private ArtistAdapter mArtistAdapter;
 
     public ArtistsFragment() {
     }
@@ -44,7 +41,7 @@ public class ArtistsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         mArtistAdapter =
-               new ImageAndInfoAdapter(
+               new ArtistAdapter(
                        getActivity(), // The current context (this activity)
                        new ArrayList<Artist>());
 
@@ -53,6 +50,18 @@ public class ArtistsFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         ListView listView = (ListView) rootView.findViewById(R.id.listview_artists);
         listView.setAdapter(mArtistAdapter);
+        // Clinking on an item...
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Artist chosenArtist = artists.get(position);
+                String artistId = chosenArtist.id;
+                Intent intent = new Intent(getActivity(), TopTracksActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, artistId);
+                startActivity(intent);
+            }
+        });
+
 
         Button buttonSearch = (Button) rootView.findViewById(R.id.button_search);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
@@ -68,6 +77,8 @@ public class ArtistsFragment extends Fragment {
 
         return rootView;
     }
+
+
 
     public class FetchArtistsTask extends AsyncTask<String, Void, List<Artist>> {
 
